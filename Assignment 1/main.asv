@@ -133,8 +133,9 @@ str=["2022-12-30"];
 % Conversion into datetime and find matching date indexes
 date_arr = datetime(str,'InputFormat','yyyy-MM-dd', 'Format','dd/MM/yyyy');
 dates=datetime(price.Date,'Format','dd/MM/yyyy');
+dates(end)
 
-[logical_index, date_arr_index]=ismember(date_arr, dates);
+[logical_index, date_arr_index]=ismember(date_arr, dates)
 
 date_arr_index=date_arr_index-1;
 
@@ -165,7 +166,7 @@ VAR
  
 sigma = zeros(length(date_arr),1);
 
-for i=1:length(date_arr) 
+for i=1:length(date_arr); 
 
 % Estimating the model
 EstMdlG12 = estimate(MdlAR2G12, simple_y(1:date_arr_index(i)));
@@ -177,9 +178,9 @@ const = EstMdlG12.Variance.Constant
 alpha=cell2mat(EstMdlG12.Variance.ARCH)
 beta=cell2mat(EstMdlG12.Variance.GARCH)
 
-sigma(i) = sqrt(const + alpha(1)*resG12(date_arr_index(i))^2+beta*varG12(date_arr_index(i)));
+sigma(i) = sqrt(const + alpha(0)*resG12(date_arr_index(i))(2:end)^2 alpha(1)*resG12(date_arr_index(i))^2+beta*varG12(date_arr_index(i)));
 end 
-
+sigma(1)
 VAR_Garch=zeros(length(date_arr),1);
 
 for i=1:length(date_arr_index)
