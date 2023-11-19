@@ -167,24 +167,24 @@ sigma = zeros(length(date_arr),1);
 
 for i=1:length(date_arr) 
 
-% Estimating the model
-EstMdlG12 = estimate(MdlAR2G12, simple_y(1:date_arr_index(i)));
-[resG12,varG12,logLG12] = infer(EstMdlG12, simple_y(1:date_arr_index(i)));
-length(varG12_lag1)
+    % Estimating the model
+    EstMdlG12 = estimate(MdlAR2G12, simple_y(1:date_arr_index(i)));
+    [resG12,varG12,logLG12] = infer(EstMdlG12, simple_y(1:date_arr_index(i)));
+    length(varG12_lag1)
 
-const = EstMdlG12.Variance.Constant
-alpha = cell2mat(EstMdlG12.Variance.ARCH)
-beta = cell2mat(EstMdlG12.Variance.GARCH)
+    const = EstMdlG12.Variance.Constant
+    alpha = cell2mat(EstMdlG12.Variance.ARCH)
+    beta = cell2mat(EstMdlG12.Variance.GARCH)
 
-% Forecast parameters
+    % Forecast parameters
 
-epsilon = resG12(date_arr_index(i))
-variance = varG12(date_arr_index(i))
-variance_lag1 = varG12_lag1(date_arr_index(i) - 1)
+    epsilon = resG12(date_arr_index(i))
+    variance = varG12(date_arr_index(i))
+    variance_lag1 = varG12_lag1(date_arr_index(i) - 1)
 
-% Computing variance forecast
+    % Computing variance forecast
 
-sigma(i) = sqrt(const + alpha*epsilon^2+beta(1)*variance+beta(2)*variance_lag1);
+    sigma(i) = sqrt(const + alpha*epsilon^2+beta(1)*variance+beta(2)*variance_lag1);
 end 
 
 VAR_Garch=zeros(length(date_arr),1);
