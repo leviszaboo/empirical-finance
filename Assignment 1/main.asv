@@ -92,7 +92,7 @@ hold off
 %% Question 3 (a)
 
 % Fit AR(2)-GARCH(1,2) model with t-distributed errors
-MdlAR2G12 = arima('ARLags', [1, 2], 'Variance', garch('ARCHLags', 2, 'GARCHLags', 1, 'Distribution', 't'));
+MdlAR2G12 = arima('ARLags', [1, 2], 'Variance', garch('ARCHLags', 1, 'GARCHLags', [1, 2], 'Distribution', 't'));
 EstMdlAR2G12 = estimate(MdlAR2G12, simple_y);
 
 % Obtain standardized residuals
@@ -112,7 +112,7 @@ hold off
 %% Question 3 (b)
 
 % Fit AR(2)-GARCH(1,2) model with standard normally distributed errors
-MdlNormal = arima('ARLags', [1, 2], 'Variance', garch('ARCHLags', 2, 'GARCHLags', 1, 'Distribution', 'Gaussian'));
+MdlNormal = arima('ARLags', [1, 2], 'Variance', garch('ARCHLags', 1, 'GARCHLags', [1, 2], 'Distribution', 'Gaussian'));
 EstMdlNormal = estimate(MdlNormal, simple_y);
 
 
@@ -127,15 +127,18 @@ dof = 1;
 
 %% Question 4 (a)
 
+% Although in this section, the for loops, storing a single date in an array 
+% and the array of sigmas and VAR values are not convenient for one forecast,
+% it makes the code easily reusable if we include additional dates.
+
 % Last trading day of 2022
 str=["2022-12-30"];
 
 % Conversion into datetime and find matching date indexes
 date_arr = datetime(str,'InputFormat','yyyy-MM-dd', 'Format','dd/MM/yyyy');
 dates=datetime(price.Date,'Format','dd/MM/yyyy');
-dates(end)
 
-[logical_index, date_arr_index]=ismember(date_arr, dates)
+[logical_index, date_arr_index]=ismember(date_arr, dates);
 
 date_arr_index=date_arr_index-1;
 
@@ -148,43 +151,72 @@ val=100;
 VAR=zeros(length(W_E),length(date_arr)); 
 
 for i=1:length(date_arr_index)
-    for w=1:length(W_E)
-        date_arr_index(i)-W_E(w)+1
-        data=simple_y(date_arr_index(i)-W_E(w)+1:date_arr_index(i)); 
+    for j=1:length(W_E)
+        date_arr_index(i)-W_E(j)+1;
+        data=simple_y(date_arr_index(i)-W_E(j)+1:date_arr_index(i)); 
         data=sort(data); 
-        VAR(w,i)= -data(W_E(w)*p)*val;
+        VAR(j,i)= -data(W_E(j)*p)*val;
     end 
 end 
 
 VAR
 
 %% Question 4 (b)
-
-% Although in this case, the for loops and the array of sigmas and VAR values 
-% are not convenient for one forecast, it helps if we would like to include 
-% additional dates.
  
 sigma = zeros(length(date_arr),1);
 
-for i=1:length(date_arr); 
+for i=1:length(date_arr) 
 
 % Estimating the model
 EstMdlG12 = estimate(MdlAR2G12, simple_y(1:date_arr_index(i)));
+% EstMdlG12_lag1 = estimate(MdlAR2G12, simple_y(1:date_arr_index(i) - 1));
 [resG12,varG12,logLG12] = infer(EstMdlG12, simple_y(1:date_arr_index(i)));
-length(resG12)
+[~, varG12_lag1, ~] = infer(EstMdlG12, simple_y(1:date_arr_index(i) - 1));
+varG!@
 % Computing variance forecasts
 
 const = EstMdlG12.Variance.Constant
-alpha=cell2mat(EstMdlG12.Variance.ARCH)
-beta=cell2mat(EstMdlG12.Variance.GARCH)
+alpha = cell2mat(EstMdlG12.Variance.ARCH)
+beta = cell2mat(EstMdlG12.Variance.GARCH)
 
-sigma(i) = sqrt(const + alpha(0)*resG12(date_arr_index(i))(2:end)^2 alpha(1)*resG12(date_arr_index(i))^2+beta*varG12(date_arr_index(i)));
+variance = varG12(date_arr_index(i))
+variance_lag1 = varG12_lag1(date_arr_index(i))
+
+sigma(i) = sqrt(const + alpha*resG12(date_arr_index(i))^2+beta(1)*variance+beta(2)*variance_lag1);
 end 
-sigma(1)
+
 VAR_Garch=zeros(length(date_arr),1);
 
 for i=1:length(date_arr_index)
-    VAR_Garch(i) = -sigma(i)*norminv(0.05)*val;
+    VAR_Garch(i) = -sigma(i)*norminv(p)*val;
 end 
 
 VAR_Garch
+
+%% Question 4 (c)
+
+% (I) Simple ES
+
+ES_Simple = zeros(length(W_E),length(date_arr));
+
+% Calculating the average of all observations less than or equal to p ∗ W * 100 
+
+for i=1:length(date_arr_index)
+    for j=1:length(W_E)
+        data=simple_y(date_arr_index(i)-W_E(j)+1:date_arr_index(i)); 
+        data=sort(data); 
+        ES_Simple(j,i)= -mean(data(1:W_E(j)*p))*val;
+    end 
+end 
+
+ES_Simple
+
+% (I) GARCH(1,2)-based ES
+
+ES_Garch= zeros(length(date_arr),1); 
+
+for i=1:length(date_arr_index)
+    ES_Garch(i) = sigma(i)*normpdf(norminv(p))*val/p;
+end 
+
+ES_Garch
