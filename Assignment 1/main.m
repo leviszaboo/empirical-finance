@@ -9,7 +9,7 @@ f=0;
 
 %% Question 1 (a)
 % Load the data using hist_stock_data.m
-price = hist_stock_data('01012002', '31122023', 'PEP');
+price = hist_stock_data('01012000', '31122022', 'PEP');
 
 % % Plot returns 
 f=f+1; 
@@ -170,17 +170,15 @@ for i=1:length(date_arr)
     % Estimating the model
     EstMdlG12 = estimate(MdlAR2G12, simple_y(1:date_arr_index(i)));
     [resG12,varG12,logLG12] = infer(EstMdlG12, simple_y(1:date_arr_index(i)));
-    length(varG12_lag1)
 
     const = EstMdlG12.Variance.Constant
     alpha = cell2mat(EstMdlG12.Variance.ARCH)
     beta = cell2mat(EstMdlG12.Variance.GARCH)
 
     % Forecast parameters
-
     epsilon = resG12(date_arr_index(i))
     variance = varG12(date_arr_index(i))
-    variance_lag1 = varG12_lag1(date_arr_index(i) - 1)
+    variance_lag1 = varG12(date_arr_index(i) - 1)
 
     % Computing variance forecast
 
