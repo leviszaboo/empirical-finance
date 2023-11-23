@@ -1,7 +1,7 @@
 %% Stock Data Pepsico Inc. (2000-2022)
 % For Empirical Finance 3.2
 % Assignment 1
-% By team 25
+% By: Nicolas Barry, Levente Szabo, Renzo Vermeulen
 
 addpath('./hist_stock_data');
 
