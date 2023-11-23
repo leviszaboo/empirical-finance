@@ -89,6 +89,69 @@ hold off
 % Sanity check: Jarque-Bèra test
 [h,p,jbstat,critval] = jbtest(simple_y)
 
+%% Question 2 (a)
+
+% (a) Fit an AR(1)-ARCH(2) model and display the output
+MdlAR1ARCH2 = arima('ARLags', 1, 'Variance', garch(1, 2));
+
+% Estimate the AR(1)-ARCH(2) model
+EstMdlAR1ARCH2 = estimate(MdlAR1ARCH2, simple_y);
+
+% Display the estimated coefficients
+disp('AR(1)-ARCH(2) Coefficients:');
+disp(EstMdlAR1ARCH2.AR);
+disp(EstMdlAR1ARCH2.Variance.ARCH);
+
+%% Question 2 (b) Compute standardized residuals and perform Jarque-Bera test
+[resAR1ARCH2, varAR1ARCH2, logLAR1ARCH2] = infer(EstMdlAR1ARCH2, simple_y);
+stdresAR1ARCH2 = resAR1ARCH2 ./ sqrt(varAR1ARCH2);
+
+% Jarque-Bera test
+[h_JB_AR1ARCH2, p_JB_AR1ARCH2, jbstat_JB_AR1ARCH2, critval_JB_AR1ARCH2] = jbtest(stdresAR1ARCH2);
+
+% Display the Jarque-Bera test results
+disp('Jarque-Bera Test for AR(1)-ARCH(2) Residuals:');
+disp(['Hypothesis Test (H0: Residuals are normally distributed): ', num2str(h_JB_AR1ARCH2)]);
+disp(['P-value: ', num2str(p_JB_AR1ARCH2)]);
+disp(['J-B statistic: ', num2str(jbstat_JB_AR1ARCH2)]);
+disp(['Critical values at the 5% significance level: ', num2str(critval_JB_AR1ARCH2)]);
+
+%% Question 2 (c) Fit an AR(2)-GARCH(1,2) model and display the output
+MdlAR2GARCH12 = arima('ARLags', 2, 'Variance', garch(1, 2));
+
+% Estimate the AR(2)-GARCH(1,2) model
+EstMdlAR2GARCH12 = estimate(MdlAR2GARCH12, simple_y);
+
+% Display the estimated coefficients
+disp('AR(2)-GARCH(1,2) Coefficients:');
+disp(EstMdlAR2GARCH12.AR);
+disp(EstMdlAR2GARCH12.Variance.ARCH);
+
+%% Question 2 (d) Compute standardized residuals and perform Jarque-Bera test for AR(2)-GARCH(1,2)
+[resAR2GARCH12, varAR2GARCH12, logLAR2GARCH12] = infer(EstMdlAR2GARCH12, simple_y);
+stdresAR2GARCH12 = resAR2GARCH12 ./ sqrt(varAR2GARCH12);
+
+% Jarque-Bera test
+[h_JB_AR2GARCH12, p_JB_AR2GARCH12, jbstat_JB_AR2GARCH12, critval_JB_AR2GARCH12] = jbtest(stdresAR2GARCH12);
+
+% Display the Jarque-Bera test results
+disp('Jarque-Bera Test for AR(2)-GARCH(1,2) Residuals:');
+disp(['Hypothesis Test (H0: Residuals are normally distributed): ', num2str(h_JB_AR2GARCH12)]);
+disp(['P-value: ', num2str(p_JB_AR2GARCH12)]);
+disp(['J-B statistic: ', num2str(jbstat_JB_AR2GARCH12)]);
+disp(['Critical values at the 5% significance level: ', num2str(critval_JB_AR2GARCH12)]);
+
+%% (e) Likelihood Ratio Test
+% Loglikelihood value for AR(1)-ARCH(2) model
+[~, ~, logL_AR1ARCH2] = infer(EstMdlAR1ARCH2, simple_y);
+
+% Loglikelihood value for AR(2)-GARCH(1,2) model
+[~, ~, logL_AR2GARCH12] = infer(EstMdlAR2GARCH12, simple_y);
+
+% Perform Likelihood Ratio Test
+dof = 1;  % Difference in the number of parameters between models
+[h1,pValue1,stat1,cValue1] = lratiotest(logL_AR1ARCH2, logL_AR2GARCH12, dof)
+
 %% Question 3 (a)
 
 % Fit AR(2)-GARCH(1,2) model with t-distributed errors
@@ -104,9 +167,9 @@ f=f+1;
 figure(f)
 hold on
 plot(price.Date(2:end), stdresAR2G12)
-legend('GARCH(1,2) Residuals')
+ylabel('Standardized Residuals')
+legend('GARCH(1,2) Standardized Residuals')
 xlabel('Date');
-ylabel('Standardized Returns');
 hold off 
 
 %% Question 3 (b)
@@ -120,10 +183,10 @@ EstMdlNormal = estimate(MdlNormal, simple_y);
 [~, ~, logLNormal] = infer(EstMdlNormal, simple_y);
 
 % Perform Likelihood Ratio Test
-logLU = logLAR2G12;
-logLR = logLNormal;
-dof = 1;  
-[h,pValue,stat,cValue] = lratiotest(logLU,logLR,dof)
+logLU = logLAR2G12; % Log-likelihood of unrestricted model
+logLR = logLNormal; % Log-likelihood of restricted model
+dof = 1;  % Difference in number of parameters
+[h2,pValue2,stat2,cValue2] = lratiotest(logLU,logLR,dof)
 
 %% Question 4 (a)
 
@@ -162,7 +225,7 @@ end
 VAR
 
 %% Question 4 (b)
- 
+
 sigma = zeros(length(date_arr),1);
 
 for i=1:length(date_arr) 
@@ -220,3 +283,8 @@ for i=1:length(date_arr_index)
 end 
 
 ES_Garch
+
+
+
+
+
