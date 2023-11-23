@@ -1,7 +1,7 @@
 %% Stock Data Pepsico Inc. (2000-2022)
 % For Empirical Finance 3.2
 % Assignment 1
-% By: Nicolas Barry, Levente Szabo, Renzo Vermeulen
+% By Team 25: Nicolas Barry, Levente Szabo, Renzo Vermeulen
 
 addpath('./hist_stock_data');
 
@@ -63,19 +63,24 @@ xlabel('Nr. of Lags')
 hold off
 
 %% Question 1 (d) 
-[h,p,stat,cValue] = lbqtest(simple_y,'Lags',20)
-% Robustness checks
-[h,p,stat,cValue] = lbqtest(simple_y,'Lags',25)
-[h,p,stat,cValue] = lbqtest(simple_y,'Lags',30)
-[h,p,stat,cValue] = lbqtest(simple_y,'Lags',35)
-[h,p,stat,cValue] = lbqtest(simple_y,'Lags',60)
-[h,p,stat,cValue] = lbqtest(simple_y,'Lags',120)
-[h,p,stat,cValue] = lbqtest(simple_y,'Lags',200)
+
+% Robustness checks: performing Ljung-Box tests
+
+[h_1,p_1,stat_1,cValue_1] = lbqtest(simple_y,'Lags',20)
+[h_2,p_2,stat_2,cValue_2] = lbqtest(simple_y,'Lags',25)
+[h_3,p_3,stat_3,cValue_3] = lbqtest(simple_y,'Lags',30)
+[h_4,p_4,stat_4,cValue_4] = lbqtest(simple_y,'Lags',35)
+[h_5,p_5,stat_5,cValue_5] = lbqtest(simple_y,'Lags',60)
+[h_6,p_6,stat_6,cValue_6] = lbqtest(simple_y,'Lags',120)
+[h_7,p_7,stat_7,cValue_7] = lbqtest(simple_y,'Lags',200)
 
 
 %% Question 1 (e)
+
+% Standardizing the returns
 [muhat,sigmahat]=normfit(simple_y);
 standard_simple_y = (simple_y - muhat)./sigmahat;
+
 % The QQ-plot of the returns
 
 f=f+1; 
@@ -85,22 +90,22 @@ qqplot(standard_simple_y)
 hold off
 
 % Sanity check: Jarque-Bèra test
-[h,p,jbstat,critval] = jbtest(simple_y)
+[hJB,pJB,jbstat,critval] = jbtest(simple_y)
 
 %% Question 2 (a)
 
-% (a) Fit an AR(1)-ARCH(2) model and display the output
+% (a) Fitting an AR(1)-ARCH(2) model and display the output
 MdlAR1ARCH2 = arima('ARLags', 1, 'Variance', garch(1, 2));
 
-% Estimate the AR(1)-ARCH(2) model
+% Estimating the AR(1)-ARCH(2) model
 EstMdlAR1ARCH2 = estimate(MdlAR1ARCH2, simple_y);
 
-% Display the estimated coefficients
 disp('AR(1)-ARCH(2) Coefficients:');
 disp(EstMdlAR1ARCH2.AR);
 disp(EstMdlAR1ARCH2.Variance.ARCH);
 
-%% Question 2 (b) Compute standardized residuals and perform Jarque-Bera test
+%% Question 2 (b) 
+%Computing standardized residuals (AR(1)-ARCH(2))
 [resAR1ARCH2, varAR1ARCH2, logLAR1ARCH2] = infer(EstMdlAR1ARCH2, simple_y);
 stdresAR1ARCH2 = resAR1ARCH2 ./ sqrt(varAR1ARCH2);
 
@@ -114,32 +119,21 @@ disp(['P-value: ', num2str(p_JB_AR1ARCH2)]);
 disp(['J-B statistic: ', num2str(jbstat_JB_AR1ARCH2)]);
 disp(['Critical values at the 5% significance level: ', num2str(critval_JB_AR1ARCH2)]);
 
-%% Question 2 (c) Fit an AR(2)-GARCH(1,2) model and display the output
+%% Question 2 (c) 
 MdlAR2GARCH12 = arima('ARLags', 2, 'Variance', garch(1, 2));
 
-% Estimate the AR(2)-GARCH(1,2) model
+% Estimating the AR(2)-GARCH(1,2) model
 EstMdlAR2GARCH12 = estimate(MdlAR2GARCH12, simple_y);
 
-% Display the estimated coefficients
-disp('AR(2)-GARCH(1,2) Coefficients:');
-disp(EstMdlAR2GARCH12.AR);
-disp(EstMdlAR2GARCH12.Variance.ARCH);
-
-%% Question 2 (d) Compute standardized residuals and perform Jarque-Bera test for AR(2)-GARCH(1,2)
+%% Question 2 (d) 
+% Computing standardized residuals(AR(2)-GARCH(1,2))
 [resAR2GARCH12, varAR2GARCH12, logLAR2GARCH12] = infer(EstMdlAR2GARCH12, simple_y);
 stdresAR2GARCH12 = resAR2GARCH12 ./ sqrt(varAR2GARCH12);
 
 % Jarque-Bera test
-[h_JB_AR2GARCH12, p_JB_AR2GARCH12, jbstat_JB_AR2GARCH12, critval_JB_AR2GARCH12] = jbtest(stdresAR2GARCH12);
+[h_JB_AR2GARCH12, p_JB_AR2GARCH12, jbstat_JB_AR2GARCH12, critval_JB_AR2GARCH12] = jbtest(stdresAR2GARCH12)
 
-% Display the Jarque-Bera test results
-disp('Jarque-Bera Test for AR(2)-GARCH(1,2) Residuals:');
-disp(['Hypothesis Test (H0: Residuals are normally distributed): ', num2str(h_JB_AR2GARCH12)]);
-disp(['P-value: ', num2str(p_JB_AR2GARCH12)]);
-disp(['J-B statistic: ', num2str(jbstat_JB_AR2GARCH12)]);
-disp(['Critical values at the 5% significance level: ', num2str(critval_JB_AR2GARCH12)]);
-
-%% (e) Likelihood Ratio Test
+%% Question 2 (e) 
 % Loglikelihood value for AR(1)-ARCH(2) model
 [~, ~, logL_AR1ARCH2] = infer(EstMdlAR1ARCH2, simple_y);
 
@@ -153,7 +147,7 @@ dof = 1;  % Difference in the number of parameters between models
 %% Question 3 (a)
 
 % Fit AR(2)-GARCH(1,2) model with t-distributed errors
-MdlAR2G12 = arima('ARLags', [1, 2], 'Variance', garch('ARCHLags', 1, 'GARCHLags', [1, 2], 'Distribution', 't'));
+MdlAR2G12 = arima('ARLags', [1, 2], 'Variance', garch('ARCHLags', [1, 2], 'GARCHLags', 1, 'Distribution', 't'));
 EstMdlAR2G12 = estimate(MdlAR2G12, simple_y);
 
 [resAR2G12, varAR2G12, logLAR2G12] = infer(EstMdlAR2G12, simple_y);
@@ -172,7 +166,7 @@ hold off
 %% Question 3 (b)
 
 % Fit AR(2)-GARCH(1,2) model with standard normally distributed errors
-MdlNormal = arima('ARLags', [1, 2], 'Variance', garch('ARCHLags', 1, 'GARCHLags', [1, 2], 'Distribution', 'Gaussian'));
+MdlNormal = arima('ARLags', [1, 2], 'Variance', garch('ARCHLags', [1, 2], 'GARCHLags', 1, 'Distribution', 'Gaussian'));
 EstMdlNormal = estimate(MdlNormal, simple_y);
 
 % Obtain loglikelihood
@@ -235,12 +229,12 @@ for i=1:length(date_arr)
 
     % Forecast parameters
     epsilon = resG12(date_arr_index(i));
+    epsilon_lag1 = resG12(date_arr_index(i) - 1);
     variance = varG12(date_arr_index(i));
-    variance_lag1 = varG12(date_arr_index(i) - 1);
 
     % Computing variance forecast
 
-    sigma(i) = sqrt(const + alpha*epsilon^2+beta(1)*variance+beta(2)*variance_lag1);
+    sigma(i) = sqrt(const + alpha(1)*epsilon^2+alpha(2)*epsilon_lag1^2+beta*variance);
 end 
 
 VAR_Garch=zeros(length(date_arr),1);
