@@ -73,8 +73,6 @@ hold off
 [h,p,stat,cValue] = lbqtest(simple_y,'Lags',200)
 
 
-
-
 %% Question 1 (e)
 [muhat,sigmahat]=normfit(simple_y);
 standard_simple_y = (simple_y - muhat)./sigmahat;
@@ -158,7 +156,6 @@ dof = 1;  % Difference in the number of parameters between models
 MdlAR2G12 = arima('ARLags', [1, 2], 'Variance', garch('ARCHLags', 1, 'GARCHLags', [1, 2], 'Distribution', 't'));
 EstMdlAR2G12 = estimate(MdlAR2G12, simple_y);
 
-% Obtain standardized residuals
 [resAR2G12, varAR2G12, logLAR2G12] = infer(EstMdlAR2G12, simple_y);
 stdresAR2G12 = resAR2G12 ./ sqrt(varAR2G12);
 
@@ -177,7 +174,6 @@ hold off
 % Fit AR(2)-GARCH(1,2) model with standard normally distributed errors
 MdlNormal = arima('ARLags', [1, 2], 'Variance', garch('ARCHLags', 1, 'GARCHLags', [1, 2], 'Distribution', 'Gaussian'));
 EstMdlNormal = estimate(MdlNormal, simple_y);
-
 
 % Obtain loglikelihood
 [~, ~, logLNormal] = infer(EstMdlNormal, simple_y);
@@ -215,7 +211,6 @@ VAR=zeros(length(W_E),length(date_arr));
 
 for i=1:length(date_arr_index)
     for j=1:length(W_E)
-        date_arr_index(i)-W_E(j)+1;
         data=simple_y(date_arr_index(i)-W_E(j)+1:date_arr_index(i)); 
         data=sort(data); 
         VAR(j,i)= -data(W_E(j)*p)*val;
@@ -234,14 +229,14 @@ for i=1:length(date_arr)
     EstMdlG12 = estimate(MdlAR2G12, simple_y(1:date_arr_index(i)));
     [resG12,varG12,logLG12] = infer(EstMdlG12, simple_y(1:date_arr_index(i)));
 
-    const = EstMdlG12.Variance.Constant
-    alpha = cell2mat(EstMdlG12.Variance.ARCH)
-    beta = cell2mat(EstMdlG12.Variance.GARCH)
+    const = EstMdlG12.Variance.Constant;
+    alpha = cell2mat(EstMdlG12.Variance.ARCH);
+    beta = cell2mat(EstMdlG12.Variance.GARCH);
 
     % Forecast parameters
-    epsilon = resG12(date_arr_index(i))
-    variance = varG12(date_arr_index(i))
-    variance_lag1 = varG12(date_arr_index(i) - 1)
+    epsilon = resG12(date_arr_index(i));
+    variance = varG12(date_arr_index(i));
+    variance_lag1 = varG12(date_arr_index(i) - 1);
 
     % Computing variance forecast
 
