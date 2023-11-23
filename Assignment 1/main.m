@@ -112,15 +112,8 @@ stdresAR1ARCH2 = resAR1ARCH2 ./ sqrt(varAR1ARCH2);
 % Jarque-Bera test
 [h_JB_AR1ARCH2, p_JB_AR1ARCH2, jbstat_JB_AR1ARCH2, critval_JB_AR1ARCH2] = jbtest(stdresAR1ARCH2);
 
-% Display the Jarque-Bera test results
-disp('Jarque-Bera Test for AR(1)-ARCH(2) Residuals:');
-disp(['Hypothesis Test (H0: Residuals are normally distributed): ', num2str(h_JB_AR1ARCH2)]);
-disp(['P-value: ', num2str(p_JB_AR1ARCH2)]);
-disp(['J-B statistic: ', num2str(jbstat_JB_AR1ARCH2)]);
-disp(['Critical values at the 5% significance level: ', num2str(critval_JB_AR1ARCH2)]);
-
 %% Question 2 (c) 
-MdlAR2GARCH12 = arima('ARLags', 2, 'Variance', garch(1, 2));
+MdlAR2GARCH12 = arima('ARLags', [1, 2], 'Variance', garch(1, 2));
 
 % Estimating the AR(2)-GARCH(1,2) model
 EstMdlAR2GARCH12 = estimate(MdlAR2GARCH12, simple_y);
