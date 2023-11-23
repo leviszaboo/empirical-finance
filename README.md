@@ -3,3 +3,4 @@
 ## Credits:
 #### Assignment 1:
   - Question 1: Renzo Vermeulen
+  - Question 2: Nicolas Barry
