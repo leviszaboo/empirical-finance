@@ -90,7 +90,7 @@ qqplot(standard_simple_y)
 hold off
 
 % Sanity check: Jarque-Bèra test
-[hJB,pJB,jbstat,critval] = jbtest(simple_y)
+[h3,p3,jbstat3,critval3] = jbtest(simple_y)
 
 %% Question 2 (a)
 
@@ -105,12 +105,12 @@ disp(EstMdlAR1ARCH2.AR);
 disp(EstMdlAR1ARCH2.Variance.ARCH);
 
 %% Question 2 (b) 
-%Computing standardized residuals (AR(1)-ARCH(2))
+% Computing standardized residuals (AR(1)-ARCH(2))
 [resAR1ARCH2, varAR1ARCH2, logLAR1ARCH2] = infer(EstMdlAR1ARCH2, simple_y);
 stdresAR1ARCH2 = resAR1ARCH2 ./ sqrt(varAR1ARCH2);
 
 % Jarque-Bera test
-[h_JB_AR1ARCH2, p_JB_AR1ARCH2, jbstat_JB_AR1ARCH2, critval_JB_AR1ARCH2] = jbtest(stdresAR1ARCH2);
+[h4, p4, jbstat4, critval4] = jbtest(stdresAR1ARCH2)
 
 %% Question 2 (c) 
 MdlAR2GARCH12 = arima('ARLags', [1, 2], 'Variance', garch(1, 2));
@@ -124,7 +124,7 @@ EstMdlAR2GARCH12 = estimate(MdlAR2GARCH12, simple_y);
 stdresAR2GARCH12 = resAR2GARCH12 ./ sqrt(varAR2GARCH12);
 
 % Jarque-Bera test
-[h_JB_AR2GARCH12, p_JB_AR2GARCH12, jbstat_JB_AR2GARCH12, critval_JB_AR2GARCH12] = jbtest(stdresAR2GARCH12)
+[h5, p5, jbstat5, critval5] = jbtest(stdresAR2GARCH12)
 
 %% Question 2 (e) 
 % Loglikelihood value for AR(1)-ARCH(2) model
@@ -135,7 +135,7 @@ stdresAR2GARCH12 = resAR2GARCH12 ./ sqrt(varAR2GARCH12);
 
 % Perform Likelihood Ratio Test
 dof = 1;  % Difference in the number of parameters between models
-[h1,pValue1,stat1,cValue1] = lratiotest(logL_AR1ARCH2, logL_AR2GARCH12, dof)
+[h1,pValue1,stat1,cValue1] = lratiotest(logL_AR2GARCH12, logL_AR1ARCH2, dof)
 
 %% Question 3 (a)
 
