@@ -1,7 +1,7 @@
 %% Stock Data Intel Corporation (2012-2022)
 % For Empirical Finance 3.2
 % Assignment 2
-% By team 40 (Levi Szabo, Barry Nicolas en Renzo Vermeulen)
+% By team 40 (Levente Szabo, Nicolas Barry, Renzo Vermeulen)
 
 %% House Keeping 
 
