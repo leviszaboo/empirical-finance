@@ -51,6 +51,31 @@ ylim([3 10])
 axis tight; 
 hold off
 
+%% Question 1 (c)
+% Calculate the simulated prices
+SP1 = zeros(1,S); % vector for sim prices
+for s = 1:S % do S simulations
+SP1(s) = sum(cash_flow./((1+transpose(ysim(:,s))./100).^(1:T)));
+end
+% Replicate Plot from Slide 9 Lecture 5
+trueP = P*ones(1,S+2);
+f=f+1;
+figure(f)
+hold on
+bar(SP1)
+yl=yline(P,'-','True Price','LineWidth',3,'Color', 'r')
+yl.LabelHorizontalAlignment = 'left';
+xlabel('Simulation')
+ylabel('Simulated Price')
+xlim([0.5 8.5])
+ylim([800 1500])
+daspect([1 30 1]);
+hold off
+exportgraphics(gcf, 'Simulated_prices.png');
+
+
+
+
 %% Question 2 (a)
 % Load the data using hist_stock_data.m
 price = hist_stock_data('01012012',['31122022'],'INTC');
