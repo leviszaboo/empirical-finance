@@ -3,6 +3,8 @@
 % Assignment 2
 % By team 40 (Levente Szabo, Nicolas Barry, Renzo Vermeulen)
 
+addpath('./hist_stock_data');
+
 %% House Keeping 
 
 % Housekeeping
