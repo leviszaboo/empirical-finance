@@ -70,3 +70,71 @@ display (Q(1))
 % Compute third quartile
 Q(3) = median(y(find(y>median(y))));
 display (Q(3))
+
+%% Question 2 (b) p=0.01
+
+% Prepare the estimations by setting up the Matlab environment
+% VaR(0.01) !
+T = length(simple_y);          % number of observations for return y
+WE = 1000;                     % estimation window length
+p = 0.01;                      % VaR probability
+value = 1;                     % portfolio value
+
+VaR = NaN(T-WE, 1);             % matrix to hold VaR forecasts for 2 models
+
+% Compute the VaR forecasts for using historic simulations 
+index = p*WE;
+
+for t=1:(T-WE)
+ data= simple_y(t:WE-1+t); 
+ data=sort(data);
+ VaR(t,1) = -1*data(index)*value;
+end 
+
+% Plot returns and VaR
+f=f+1; 
+figure(f)
+hold on 
+plot(datetime(price.Date(WE+2:end)), simple_y(WE+1:end),'color',[0.5 0.5 0.5]); 
+plot(datetime(price.Date(WE+2:end)), (-1)*VaR(:,1));
+xlabel('Time');
+ylabel('Returns')
+legend('','VaR(0.01) using HS');
+hold off
+
+%% Question 2 (b) p=0.05
+%% Prepare the estimations by setting up the Matlab environment
+% VaR(0.05) !
+T = length(simple_y);          % number of observations for return y
+WE = 1000;                     % estimation window length
+p = 0.05;                      % VaR probability
+value = 1;                     % portfolio value
+
+VaR = NaN(T-WE,1);             % matrix to hold VaR forecasts for 1 model
+
+% Compute the VaR forecasts using historic simulations 
+index = p*WE;
+
+for t=1:(T-WE)
+ data= simple_y(t:WE-1+t); 
+ data=sort(data);
+ VaR(t,1) = -1*data(index)*value;
+end 
+% Save the model outcomes in a mat file
+save tmp.mat
+
+clear all;
+close all;
+clc; 
+
+load tmp.mat
+% Plot returns and VaR
+f=f+1; 
+figure(f)
+hold on 
+plot(datetime(price.Date(WE+2:end)), simple_y(WE+1:end),'color',[0.5 0.5 0.5]); 
+plot(datetime(price.Date(WE+2:end)), (-1)*VaR(:,1));
+xlabel('Time');
+ylabel('Returns')
+legend('','VaR(0.05) using HS');
+hold off
