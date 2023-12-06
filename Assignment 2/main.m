@@ -126,6 +126,19 @@ ylabel('Returns')
 legend('','VaR(0.01) using HS');
 hold off
 
+
+%% Question 2 (c) 
+% Obtain the vector of VaR-violations
+vl = zeros(T-WE,1); 
+for i=1
+    for t=1:(T-WE)
+       if simple_y(WE+t)<-VaR(t,i)
+           vl(t,i)=1; 
+       else
+       end 
+    end 
+end 
+
 % %% Perform a Bernoulli Test for VaR(0.01)
 % ber=zeros(1); 
 % ber_pvalue=zeros(1);
