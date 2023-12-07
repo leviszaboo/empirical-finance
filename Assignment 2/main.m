@@ -73,7 +73,6 @@ xlim([0.5 8.5])
 ylim([800 1500])
 daspect([1 30 1]);
 hold off
-exportgraphics(gcf, 'Simulated_prices.png');
 
 %% Question 2 (a)
 % Load the data using hist_stock_data.m
@@ -175,28 +174,35 @@ price3 = hist_stock_data('01012012','31122022','PFE');
 simple_y3=(price3.Close(2:end)-price3.Close(1:end-1))./price3.Close(1:end-1);
 
 %% Plot returns
-% Stock 1
-hold on 
-plot(price.Date, price.Close)
-xlabel('Year')
-ylabel('Price')
-title('Intel Corporation')
-hold off 
-% Stock 2
-hold on 
-plot(price2.Date, price2.Close)
-xlabel('Year')
-ylabel('Price')
-title('Abbott Laboratories')
-hold off 
-% Stock 3
-hold on 
-plot(price3.Date, price3.Close)
-xlabel('Year')
-ylabel('Price')
-title('Simple returns for three time series')
-legend('Intel Corporation','Abbott Laboratories', 'Pfizer Inc.')
-hold off
+f = f + 1;
+figure(f)
+
+return_dates = price.Date(2:end);
+
+% Plot for the first subplot
+subplot(3, 1, 1);
+plot(return_dates, simple_y, 'magenta');
+legend('Intel Corporation');
+xlabel('Year');
+ylabel('Price');
+title('Simple returns for Intel Corporation');
+
+% Plot for the second subplot
+subplot(3, 1, 2);
+plot(return_dates, simple_y2);
+legend('Abbott Laboratories');
+xlabel('Year');
+ylabel('Price');
+title('Simple returns for Abbott Laboratories');
+
+% Plot for the third subplot
+subplot(3, 1, 3);
+plot(return_dates, simple_y3, 'red');
+legend('Pfizer Inc.');
+xlabel('Year');
+ylabel('Price');
+title('Simple returns for Pfizer Inc.');
+
 
 %% Question 3(b)
 
