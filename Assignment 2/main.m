@@ -19,7 +19,7 @@ f=0;
 par = 1000;
 r= 0.073;
 yield =[5.34 4.12 3.72 3.7 3.86 3.92 3.95 3.97];
-T= length(yield)
+T= length(yield);
 
 % Price the bond
 coupon= r*par;
@@ -32,7 +32,7 @@ P= sum(cash_flow./((1+yield./100).^(1:T)));
 randn('state', 1512) % set the seed
 % Draw of random numbers to add to the yield
 S = 10; % number of simulations
-sigma = 1.25 % daily yield volatility
+sigma = 1.25; % daily yield volatility
 eps = randn(1,S)* sigma; % generate random yield changes in a loop
 % Add shift to the yield
 ysim=zeros(T,S);
@@ -230,14 +230,14 @@ for i=1:length(simple_y2)-W_E+1
   
   % Multivariate moments
   mu_opt(:,i)=[mean(simple_y(i:W_E-1+i)); mean(simple_y2(i:W_E-1+i)); mean(simple_y3(1:W_E-1+i))]; 
-  cov_opt(:,:,i)=cov([simple_y(i:W_E-1+i),simple_y2(i:W_E-1+i),simple_y3(i:W_E-1+i)]); 
+  cov_opt(:,:,i) = cov([simple_y(i:W_E-1+i), simple_y2(i:W_E-1+i), simple_y3(i:W_E-1+i)]); 
 
   % Optimization inputs
-  H_opt= gamma*cov_opt(:,:,i); % Covariance times risk aversion
-  f_opt = -mu_opt(:,i); % Negative mean
+  H_opt = gamma * cov_opt(:, :, i); % Covariance times risk aversion
+  f_opt = -mu_opt(:, i); % Negative mean
 
-  weights(:,i)=quadprog(H_opt,f_opt,[],[],Aeq,beq, lb,ub,[],options);
-end 
+  weights(:, i) = quadprog(H_opt, f_opt, [], [], Aeq, beq, lb, ub, [], options);
+end  
 
 % Plot weights
 
@@ -246,9 +246,9 @@ date=price.Date(W_E+1:end);
 f=f+1; 
 figure(f)
 hold on
-plot(date,weights(1,:))
-plot(date, weights(2,:))
-plot(date, weights(3,:))
+plot(date,weights(1, :))
+plot(date, weights(2, :))
+plot(date, weights(3, :))
 legend('Intel Corporation', 'Abbott Laboratories', 'Pfizer Inc.', 'Location', 'southoutside')
 ylabel('Optimal Weight')
 xlabel('Optimization Date')
@@ -257,7 +257,9 @@ pbaspect([2, 1, 1])
 hold off
 
 %% Question 3(c) Plot risk free rate againts portfolio returns
+
 display(date(2))
+
 % Import 5 Year Treasury Yield 
 yield = hist_stock_data('12032015','31122022', '^FVX'); % start at date W_E+1
 
@@ -283,10 +285,10 @@ end
 
 daily_rf = rf/250;
 
-portfolio_returns = zeros(length(weights)-1);
+portfolio_returns = zeros(length(weights) - 1);
 
-for i=1:(length(weights)-1)
-  portfolio_returns(i)= weights(:,i)'*[simple_y(W_E+i); simple_y2(W_E+i); simple_y3(W_E+i);];
+for i=1:(length(weights) - 1)
+  portfolio_returns(i)= weights(:, i)' * [simple_y(W_E+i); simple_y2(W_E+i); simple_y3(W_E+i);];
 end
 
 f=f+1; 
@@ -308,7 +310,39 @@ excess_vol_returns = std(excess_returns);
 
 sharp_ratio = excess_mean_returns/excess_vol_returns
 
+%% Question 4(a)
 
+volatilities = zeros(length(weights));
+
+for i=1:length(weights)
+    volatilities(i) = weights(:, i)' * cov_opt(:, :, i) * weights(:, i);
+end
+
+f=f+1; 
+figure(f)
+hold on 
+plot(date, volatilities);
+xlabel('Time');
+ylabel('Volatillity')
+hold off
+
+%% Question 4(b)
+
+vars = zeros(length(volatilities));
+
+for i=1:length(volatilities)
+    vars(i) = - volatilities(i) * norminv(0.05);
+end
+
+f=f+1; 
+figure(f)
+hold on 
+plot(date(2:end), portfolio_returns);
+plot(date, vars);
+xlabel('Time');
+ylabel('Var')
+hold off
+    
 
   
 
