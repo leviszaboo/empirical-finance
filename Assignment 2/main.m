@@ -95,122 +95,70 @@ display (Q(1))
 Q(3) = median(y(find(y>median(y))));
 display (Q(3))
 
-%% Question 2 (b) p=0.01
+%% Question 2 (b) 
 
-% Prepare the estimations by setting up the Matlab environment
-% VaR(0.01) !
+% VaR(0.01) 
 T = length(simple_y);          % number of observations for return y
 WE = 1000;                     % estimation window length
-p = 0.01;                      % VaR probability
+p = [0.01, 0.05];               % VaR probabilities
 value = 1;                     % portfolio value
 
-VaR = NaN(T-WE, 1);             % matrix to hold VaR forecasts for 2 models
+VaR = NaN(T-WE, 2);            % matrix to hold VaR forecasts
 
-% Compute the VaR forecasts for using historic simulations 
-index = p*WE;
+for i = 1:length(p)
+    p_value = p(i);
+    index = p_value * WE;
 
-for t=1:(T-WE)
- data= simple_y(t:WE-1+t); 
- data=sort(data);
- VaR(t,1) = -1*data(index)*value;
-end 
+    for t = 1:(T - WE)
+        data = simple_y(t:WE - 1 + t);
+        data = sort(data);
+        VaR(t, i) = -1 * data(index) * value;
+    end
 
-% Plot returns and VaR
-f=f+1; 
-figure(f)
-hold on 
-plot(datetime(price.Date(WE+2:end)), simple_y(WE+1:end),'color',[0.5 0.5 0.5]); 
-plot(datetime(price.Date(WE+2:end)), (-1)*VaR(:,1));
-xlabel('Time');
-ylabel('Returns')
-legend('','VaR(0.01) using HS');
-hold off
-
+    % Plot returns and VaR
+    f = f + 1;
+    figure(f)
+    hold on
+    plot(datetime(price.Date(WE + 2:end)), simple_y(WE + 1:end), 'color', [0.5 0.5 0.5]);
+    plot(datetime(price.Date(WE + 2:end)), (-1) * VaR(:, i));
+    xlabel('Time');
+    ylabel('Returns');
+    legend('Returns', ['VaR(', num2str(p_value), ') using HS']);
+    hold off
+end
 
 %% Question 2 (c) 
 % Obtain the vector of VaR-violations
-vl = zeros(T-WE,1); 
-for i=1
-    for t=1:(T-WE)
-       if simple_y(WE+t)<-VaR(t,i)
-           vl(t,i)=1; 
-       else
-       end 
+vl = zeros(T-WE, length(p)); 
+for i=1:length(p)
+  for t=1:(T-WE)
+    if simple_y(WE+t)<-VaR(t,i)
+      vl(t, i)=1; 
     end 
-end 
+  end 
+end
+    
+% Bernoulli Test for VaR(0.01)
+sum(vl(:, 1))
+length(vl(:, 1))
+ber = bern_test(p(1), vl(:, 1))
+ber_pvalue= 1-chi2cdf(ber,1)      
 
-% %% Perform a Bernoulli Test for VaR(0.01)
-% ber=zeros(1); 
-% ber_pvalue=zeros(1);
-% for i=1
-%     ber(i) = bern_test(p,vl(:,i));
-%     ber_pvalue(i)= 1-chi2cdf(ber(i),1);
-%     disp([i, ber(i),ber_pvalue(i)])
-% end          
-% 
-% %% Perform an Independence Test for VaR(0.01)      
-% ind=zeros(1); 
-% ind_pvalue=zeros(1);
-% for i=1
-%     ind(i) = ind_test(vl(:,i));
-%     ind_pvalue(i)= 1-chi2cdf(ind(i),1);
-%     disp([i, ind(i), ind_pvalue(i)])
-% end 
+% Independence Test for VaR(0.01)      
 
-%% Prepare the estimations by setting up the Matlab environment
-% VaR(0.05)
-T = length(simple_y);          % number of observations for return y
-WE = 1000;                     % estimation window length
-p = 0.05;                      % VaR probability
-value = 1;                     % portfolio value
+ind = ind_test(vl(:, 1))
+ind_pvalue= 1-chi2cdf(ind,1)
 
-VaR = NaN(T-WE,1);             % matrix to hold VaR forecasts for 1 model
+% Bernoulli Test for VaR(0.05)
 
-% Compute the VaR forecasts using historic simulations 
-index = p*WE;
+ber2 = bern_test(p(2), vl(:, 2))
+ber2_pvalue= 1-chi2cdf(ber2,1)
+          
 
-for t=1:(T-WE)
- data= simple_y(t:WE-1+t); 
- data=sort(data);
- VaR(t,1) = -1*data(index)*value;
-end 
-% Save the model outcomes in a mat file
-save tmp.mat
+% Independence Test for VaR(0.05)      
 
-clear all;
-close all;
-clc; 
-
-load tmp.mat
-% Plot returns and VaR
-f=f+1; 
-figure(f)
-hold on 
-plot(datetime(price.Date(WE+2:end)), simple_y(WE+1:end),'color',[0.5 0.5 0.5]); 
-plot(datetime(price.Date(WE+2:end)), (-1)*VaR(:,1));
-xlabel('Time');
-ylabel('Returns')
-legend('','VaR(0.05) using HS');
-hold off
-
-
-% %% Perform a Bernoulli Test for VaR(0.05)
-% ber=zeros(1); 
-% ber_pvalue=zeros(1);
-% for i=1
-%     ber(i) = bern_test(p,vl(:,i));
-%     ber_pvalue(i)= 1-chi2cdf(ber(i),1);
-%     disp([i, ber(i),ber_pvalue(i)])
-% end            
-% 
-% %% Perform an Independence Test for VaR(0.05)      
-% ind=zeros(1); 
-% ind_pvalue=zeros(1);
-% for i=1
-%     ind(i) = ind_test(vl(:,i));
-%     ind_pvalue(i)= 1-chi2cdf(ind(i),1);
-%     disp([i, ind(i), ind_pvalue(i)])
-% end 
+ind2 = ind_test(vl(:, 2))
+ind2_pvalue = 1-chi2cdf(ind2,1)
 
 %% Question 3 (a)
 
@@ -264,7 +212,7 @@ lb=zeros(1,N);
 ub=ones(1,N);
 
 % Options 
-options= optimset('Algorithm','interior-point-convex');
+options= optimset('Algorithm','interior-point-convex', 'Display','off');
 
 % Risk Aversion 
 gamma=3; 
