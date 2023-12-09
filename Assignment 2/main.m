@@ -182,7 +182,6 @@ return_dates = price.Date(2:end);
 % Plot for the first subplot
 subplot(3, 1, 1);
 plot(return_dates, simple_y, 'magenta');
-legend('Intel Corporation');
 xlabel('Year');
 ylabel('Price');
 title('Simple returns for Intel Corporation');
@@ -190,7 +189,6 @@ title('Simple returns for Intel Corporation');
 % Plot for the second subplot
 subplot(3, 1, 2);
 plot(return_dates, simple_y2);
-legend('Abbott Laboratories');
 xlabel('Year');
 ylabel('Price');
 title('Simple returns for Abbott Laboratories');
@@ -198,7 +196,6 @@ title('Simple returns for Abbott Laboratories');
 % Plot for the third subplot
 subplot(3, 1, 3);
 plot(return_dates, simple_y3, 'red');
-legend('Pfizer Inc.');
 xlabel('Year');
 ylabel('Price');
 title('Simple returns for Pfizer Inc.');
@@ -230,6 +227,7 @@ W_E=800;
 mu_opt=zeros(N,length(simple_y2)-W_E+1); 
 cov_opt=zeros(N,N,length(simple_y2)-W_E+1); 
 weights=zeros(N,length(simple_y2)-W_E+1); 
+variances=zeros(N,length(simple_y2)-W_E+1); 
 
 % Optimization loop
 for i=1:length(simple_y2)-W_E+1
@@ -237,7 +235,7 @@ for i=1:length(simple_y2)-W_E+1
   % Multivariate moments
   mu_opt(:,i)=[mean(simple_y(i:W_E-1+i)); mean(simple_y2(i:W_E-1+i)); mean(simple_y3(1:W_E-1+i))]; 
   cov_opt(:,:,i) = cov([simple_y(i:W_E-1+i), simple_y2(i:W_E-1+i), simple_y3(i:W_E-1+i)]); 
-
+  
   % Optimization inputs
   H_opt = gamma * cov_opt(:, :, i); % Covariance times risk aversion
   f_opt = -mu_opt(:, i); % Negative mean
@@ -321,7 +319,8 @@ sharp_ratio = excess_mean_returns/excess_vol_returns
 volatilities = zeros(length(weights));
 
 for i=1:length(weights)
-    volatilities(i) = weights(:, i)' * cov_opt(:, :, i) * weights(:, i);
+     variance = weights(:, i)' * cov_opt(:, :, i) * weights(:, i);
+     volatilities(i) = sqrt(variance);
 end
 
 f=f+1; 
@@ -337,7 +336,7 @@ hold off
 vars = zeros(length(volatilities));
 
 for i=1:length(volatilities)
-    vars(i) = - volatilities(i) * norminv(0.05);
+    vars(i) = volatilities(i) * norminv(0.05);
 end
 
 f=f+1; 
