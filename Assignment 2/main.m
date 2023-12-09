@@ -29,16 +29,19 @@ P= sum(cash_flow./((1+yield./100).^(1:T)));
 
 %% Question 1 (b)
 % Set seed for randomization
-randn('state', 1512) % set the seed
+rng(1512)
+
 % Draw of random numbers to add to the yield
 S = 10; % number of simulations
 sigma = 1.25; % daily yield volatility
-eps = randn(1,S)* sigma; % generate random yield changes in a loop
+eps = randn(1,S) * sigma; % generate random yield changes in a loop
+
 % Add shift to the yield
 ysim=zeros(T,S);
 for s = 1:10
   ysim(:,s) = yield + eps(s);
 end
+
 % Plot the different yields
 f=f+1;
 figure(f)
@@ -54,11 +57,14 @@ axis tight;
 hold off
 
 %% Question 1 (c)
+
 % Calculate the simulated prices
 SP1 = zeros(1,S); % vector for sim prices
+
 for s = 1:S % do S simulations
   SP1(s) = sum(cash_flow./((1+transpose(ysim(:,s))./100).^(1:T)));
 end
+
 % Replicate Plot from Slide 9 Lecture 5
 trueP = P*ones(1,S+2);
 f=f+1;
@@ -75,22 +81,23 @@ daspect([1 30 1]);
 hold off
 
 %% Question 2 (a)
+
 % Load the data using hist_stock_data.m
 price = hist_stock_data('01012012','31122022','INTC');
+
 % Calculating simple returns
 simple_y=(price.Close(2:end)-price.Close(1:end-1))./price.Close(1:end-1);
+
 % Obtain sample statistics for simple returns
 mean(simple_y)
 std(simple_y)
 min(simple_y)
 max(simple_y)
+
 % Obtain first and third quartiles for simple returns
-% Step 1 - rank the data
 y = sort(simple_y);
-% Compute first quartile
 Q(1) = median(y(find(y<median(y))));
 display (Q(1))
-% Compute third quartile
 Q(3) = median(y(find(y>median(y))));
 display (Q(3))
 
@@ -232,15 +239,15 @@ variances=zeros(N,length(simple_y2)-W_E+1);
 % Optimization loop
 for i=1:length(simple_y2)-W_E+1
   
-  % Multivariate moments
-  mu_opt(:,i)=[mean(simple_y(i:W_E-1+i)); mean(simple_y2(i:W_E-1+i)); mean(simple_y3(1:W_E-1+i))]; 
-  cov_opt(:,:,i) = cov([simple_y(i:W_E-1+i), simple_y2(i:W_E-1+i), simple_y3(i:W_E-1+i)]); 
-  
-  % Optimization inputs
-  H_opt = gamma * cov_opt(:, :, i); % Covariance times risk aversion
-  f_opt = -mu_opt(:, i); % Negative mean
+    % Multivariate moments
+    mu_opt(:,i)=[mean(simple_y(i:W_E-1+i)); mean(simple_y2(i:W_E-1+i)); mean(simple_y3(1:W_E-1+i))]; 
+    cov_opt(:,:,i) = cov([simple_y(i:W_E-1+i), simple_y2(i:W_E-1+i), simple_y3(i:W_E-1+i)]); 
 
-  weights(:, i) = quadprog(H_opt, f_opt, [], [], Aeq, beq, lb, ub, [], options);
+    % Optimization inputs
+    H_opt = gamma * cov_opt(:, :, i); % Covariance times risk aversion
+    f_opt = -mu_opt(:, i); % Negative mean
+
+    weights(:, i) = quadprog(H_opt, f_opt, [], [], Aeq, beq, lb, ub, [], options);
 end  
 
 % Plot weights
@@ -292,7 +299,7 @@ daily_rf = rf/250;
 portfolio_returns = zeros(length(weights) - 1);
 
 for i=1:(length(weights) - 1)
-  portfolio_returns(i)= weights(:, i)' * [simple_y(W_E+i); simple_y2(W_E+i); simple_y3(W_E+i);];
+    portfolio_returns(i)= weights(:, i)' * [simple_y(W_E+i); simple_y2(W_E+i); simple_y3(W_E+i);];
 end
 
 f=f+1; 
@@ -327,27 +334,44 @@ f=f+1;
 figure(f)
 hold on 
 plot(date, volatilities);
+ylim([0 0.025])
 xlabel('Time');
 ylabel('Volatillity')
 hold off
 
 %% Question 4(b)
-investment=1
-p=0.05
+
+investment = 1;
+p = 0.05;
 vars = zeros(length(volatilities));
 
 for i=1:length(volatilities)
-    vars(i) = volatilities(i) * norminv(p)*investment;
+    vars(i) = volatilities(i) * norminv(p) * investment;
 end
 
 f=f+1; 
 figure(f)
 hold on 
-plot(date(2:end), portfolio_returns);
-plot(date, vars);
+plot(date(2:end), portfolio_returns, "blue");
+plot(date, vars, "red");
 xlabel('Time');
 ylabel('Var')
 hold off
+
+%% Question 4(c)
+
+vl_portfolio = zeros(length(portfolio_returns));
+
+for t = 1:length(portfolio_returns)
+    if portfolio_returns(t) < vars(t)
+        vl_portfolio(t) = 1;
+    end
+end
+
+vratio = sum(vl_portfolio, "all") / length(vl_portfolio)
+
+
+
     
 
   
