@@ -332,11 +332,12 @@ ylabel('Volatillity')
 hold off
 
 %% Question 4(b)
-
+investment=1
+p=0.05
 vars = zeros(length(volatilities));
 
 for i=1:length(volatilities)
-    vars(i) = volatilities(i) * norminv(0.05);
+    vars(i) = volatilities(i) * norminv(p)*investment;
 end
 
 f=f+1; 
