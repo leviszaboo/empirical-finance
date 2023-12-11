@@ -308,7 +308,7 @@ hold on
 plot(date(2:end), daily_rf);
 plot(date(2:end), portfolio_returns);
 xlabel('Time');
-ylabel('Rate')
+ylabel('Returns')
 legend('Daily Risk Free Rate', 'Portfolio Returns');
 hold off
 
@@ -354,8 +354,9 @@ figure(f)
 hold on 
 plot(date(2:end), portfolio_returns, "blue");
 plot(date, vars, "red");
+legend("Portfolio Returns", "VaR(0.05")
 xlabel('Time');
-ylabel('Var')
+ylabel('Returns')
 hold off
 
 %% Question 4(c)
