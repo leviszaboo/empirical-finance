@@ -17,15 +17,15 @@ f=0;
 
 %% Question 1 (a)
 par = 1000;
-r= 0.073;
-yield =[5.34 4.12 3.72 3.7 3.86 3.92 3.95 3.97];
-T= length(yield);
+r = 0.073;
+yield = [5.34 4.12 3.72 3.7 3.86 3.92 3.95 3.97];
+T = length(yield);
 
 % Price the bond
 coupon= r*par;
 cash_flow=coupon+zeros(1,T);
-cash_flow(8)=cash_flow(8)+par;
-P= sum(cash_flow./((1+yield./100).^(1:T)));
+cash_flow(T) = cash_flow(T)+par;
+P = sum(cash_flow./((1+yield./100).^(1:T)));
 
 %% Question 1 (b)
 % Set seed for randomization
