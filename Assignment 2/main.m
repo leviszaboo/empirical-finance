@@ -29,7 +29,7 @@ P = sum(cash_flow./((1+yield./100).^(1:T)));
 
 %% Question 1 (b)
 % Set seed for randomization
-rng(1512)
+randn('state', 1512) % set the seed
 
 % Draw of random numbers to add to the yield
 S = 10; % number of simulations
@@ -190,21 +190,21 @@ return_dates = price.Date(2:end);
 subplot(3, 1, 1);
 plot(return_dates, simple_y, 'magenta');
 xlabel('Year');
-ylabel('Price');
+ylabel('Returns');
 title('Simple returns for Intel Corporation');
 
 % Plot for the second subplot
 subplot(3, 1, 2);
 plot(return_dates, simple_y2);
 xlabel('Year');
-ylabel('Price');
+ylabel('Returns');
 title('Simple returns for Abbott Laboratories');
 
 % Plot for the third subplot
 subplot(3, 1, 3);
 plot(return_dates, simple_y3, 'red');
 xlabel('Year');
-ylabel('Price');
+ylabel('Returns');
 title('Simple returns for Pfizer Inc.');
 
 
@@ -263,7 +263,7 @@ plot(date, weights(3, :))
 legend('Intel Corporation', 'Abbott Laboratories', 'Pfizer Inc.', 'Location', 'southoutside')
 ylabel('Optimal Weight')
 xlabel('Optimization Date')
-title('Portfolio Weights under Simple Volatility')
+title('Portfolio Weights under Moving Average Volatility')
 pbaspect([2, 1, 1])
 hold off
 
@@ -352,9 +352,9 @@ end
 f=f+1; 
 figure(f)
 hold on 
-plot(date(2:end), portfolio_returns, "blue");
+plot(date(2:end), portfolio_returns, "color", [0.5 0.5 0.5]);
 plot(date, vars, "red");
-legend("Portfolio Returns", "VaR(0.05")
+legend("Portfolio Returns", "VaR(0.05)")
 xlabel('Time');
 ylabel('Returns')
 hold off
@@ -370,6 +370,15 @@ for t = 1:length(portfolio_returns)
 end
 
 vratio = sum(vl_portfolio, "all") / length(vl_portfolio)
+
+
+
+    
+
+  
+
+
+
 
 
 
