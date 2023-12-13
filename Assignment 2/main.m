@@ -29,7 +29,7 @@ P = sum(cash_flow./((1+yield./100).^(1:T)));
 
 %% Question 1 (b)
 % Set seed for randomization
-rng(1512)
+randn('state', 1512) % set the seed
 
 % Draw of random numbers to add to the yield
 S = 10; % number of simulations
