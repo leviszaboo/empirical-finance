@@ -77,7 +77,7 @@ xlabel('Simulation')
 ylabel('Simulated Price')
 xlim([0.5 8.5])
 ylim([800 1500])
-daspect([1 30 1]);
+daspect([1 70 1]);
 hold off
 
 %% Question 2 (a)
