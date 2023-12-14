@@ -5,9 +5,8 @@
 
 addpath('./hist_stock_data');
 
-%% House Keeping 
+%% Housekeeping 
 
-% Housekeeping
 clear all;
 close all;
 clc; 
@@ -16,6 +15,7 @@ clc;
 f=0;
 
 %% Question 1 (a)
+
 par = 1000;
 r = 0.073;
 yield = [5.34 4.12 3.72 3.7 3.86 3.92 3.95 3.97];
@@ -28,6 +28,7 @@ cash_flow(T) = cash_flow(T)+par;
 P = sum(cash_flow./((1+yield./100).^(1:T)));
 
 %% Question 1 (b)
+
 % Set seed for randomization
 randn('state', 1512) % set the seed
 
@@ -81,25 +82,32 @@ daspect([1 70 1]);
 hold off
 
 %% Question 1 (d) 
+
 % Perform 10,000 MC simulations
 S=10000;
 eps = randn(1,S)* sigma; % generate random yield changes in a loop
+
 % Add shift to the yield
 ysim=nan(T,S);
+
 for i = 1:S
-ysim(:,i) = yield + eps(i);
+    ysim(:,i) = yield + eps(i);
 end
+
 % Price the bond
 SP2 = zeros(1,S); % vector for sim prices
 for s = 1:S % do S simulations
-SP2(s) = sum(cash_flow./((1+transpose(ysim(:,s))./100).^(1:T)));
+    SP2(s) = sum(cash_flow./((1+transpose(ysim(:,s))./100).^(1:T)));
 end
+
 % Obtain profits/losses
 PL=SP2-P;
+
 % Calculate VaR using "historic" simulation method
 PL=sort(PL);
 VaR1= PL(S*0.01);
 VaR5 = PL(S*0.05);
+
 % Plot profits/losses and VaR
 f=f+1;
 figure(f)
@@ -111,8 +119,6 @@ xline(VaR1,'--', {'VaR(0.01)'});
 xline(VaR5,'--', {'VaR(0.05)'});
 xlim([-360 600])
 hold off
-saveas(gcf, 'YieldShocking.png');
-
 
 %% Question 2 (a)
 
@@ -171,11 +177,11 @@ end
 % Obtain the vector of VaR-violations
 vl = zeros(T-WE, length(p)); 
 for i=1:length(p)
-  for t=1:(T-WE)
-    if simple_y(WE+t)<-VaR(t,i)
-      vl(t, i)=1; 
+    for t=1:(T-WE)
+      if simple_y(WE+t)<-VaR(t,i)
+        vl(t, i)=1; 
+      end 
     end 
-  end 
 end
     
 % Bernoulli Test for VaR(0.01)
@@ -330,11 +336,15 @@ end
 
 daily_rf = rf/250;
 
+% Calculating portfolio returns
+
 portfolio_returns = zeros(length(weights) - 1);
 
 for i=1:(length(weights) - 1)
     portfolio_returns(i)= weights(:, i)' * [simple_y(W_E+i); simple_y2(W_E+i); simple_y3(W_E+i);];
 end
+
+% Plotting returns against risk free rate
 
 f=f+1; 
 figure(f)
@@ -357,12 +367,16 @@ sharp_ratio = excess_mean_returns/excess_vol_returns
 
 %% Question 4(a)
 
+% Forecasting volatilities
+
 volatilities = zeros(length(weights));
 
 for i=1:length(weights)
      variance = weights(:, i)' * cov_opt(:, :, i) * weights(:, i);
      volatilities(i) = sqrt(variance);
 end
+
+% Plotting forecasted volatilities over the time period
 
 f=f+1; 
 figure(f)
@@ -373,7 +387,7 @@ xlabel('Time');
 ylabel('Volatillity')
 hold off
 
-%% Question 4(b)
+%% Question 4(b) Portfolio Value-at-Risk estimation
 
 investment = 1;
 p = 0.05;
@@ -382,6 +396,8 @@ vars = zeros(length(volatilities));
 for i=1:length(volatilities)
     vars(i) = volatilities(i) * norminv(p) * investment;
 end
+
+% Plotting VaR against returns
 
 f=f+1; 
 figure(f)
@@ -393,7 +409,7 @@ xlabel('Time');
 ylabel('Returns')
 hold off
 
-%% Question 4(c)
+%% Question 4(c) Violation Ratio of the portfolio
 
 vl_portfolio = zeros(length(portfolio_returns));
 
