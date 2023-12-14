@@ -1,4 +1,3 @@
-
 % For Empirical Finance 3.2
 % Assignment 2
 % By team 40 (Levente Szabo, Nicolas Barry, Renzo Vermeulen)
@@ -24,8 +23,8 @@ T = length(yield);
 % Price the bond
 coupon= r*par;
 cash_flow=coupon+zeros(1,T);
-cash_flow(T) = cash_flow(T)+par;
-P = sum(cash_flow./((1+yield./100).^(1:T)));
+cash_flow(T) = cash_flow(T) + par;
+P = sum(cash_flow./((1 + yield./100).^(1:T)));
 
 %% Question 1 (b)
 
@@ -40,7 +39,7 @@ eps = randn(1,S) * sigma; % generate random yield changes in a loop
 % Add shift to the yield
 ysim=zeros(T,S);
 for s = 1:10
-  ysim(:,s) = yield + eps(s);
+    ysim(:,s) = yield + eps(s);
 end
 
 % Plot the different yields
@@ -63,11 +62,12 @@ hold off
 SP1 = zeros(1,S); % vector for sim prices
 
 for s = 1:S % do S simulations
-  SP1(s) = sum(cash_flow./((1+transpose(ysim(:,s))./100).^(1:T)));
+    SP1(s) = sum(cash_flow./((1+transpose(ysim(:,s))./100).^(1:T)));
 end
 
 % Replicate Plot from Slide 9 Lecture 5
-trueP = P*ones(1,S+2);
+trueP = P * ones(1, S+2);
+
 f=f+1;
 figure(f)
 hold on
@@ -136,9 +136,9 @@ max(simple_y)
 
 % Obtain first and third quartiles for simple returns
 y = sort(simple_y);
-Q(1) = median(y(find(y<median(y))));
+Q(1) = median(y(find(y < median(y))));
 display (Q(1))
-Q(3) = median(y(find(y>median(y))));
+Q(3) = median(y(find(y > median(y))));
 display (Q(3))
 
 %% Question 2 (b) 
@@ -176,10 +176,10 @@ end
 %% Question 2 (c) 
 % Obtain the vector of VaR-violations
 vl = zeros(T-WE, length(p)); 
-for i=1:length(p)
-    for t=1:(T-WE)
-      if simple_y(WE+t)<-VaR(t,i)
-        vl(t, i)=1; 
+for i = 1:length(p)
+    for t = 1:(T-WE)
+      if simple_y(WE+t) < -VaR(t,i)
+        vl(t, i) = 1; 
       end 
     end 
 end
@@ -188,17 +188,17 @@ end
 sum(vl(:, 1))
 length(vl(:, 1))
 ber = bern_test(p(1), vl(:, 1))
-ber_pvalue= 1-chi2cdf(ber,1)      
+ber_pvalue = 1-chi2cdf(ber,1)      
 
 % Independence Test for VaR(0.01)      
 
 ind = ind_test(vl(:, 1))
-ind_pvalue= 1-chi2cdf(ind,1)
+ind_pvalue = 1-chi2cdf(ind,1)
 
 % Bernoulli Test for VaR(0.05)
 
 ber2 = bern_test(p(2), vl(:, 2))
-ber2_pvalue= 1-chi2cdf(ber2,1)
+ber2_pvalue = 1-chi2cdf(ber2,1)
           
 
 % Independence Test for VaR(0.05)      
@@ -212,13 +212,13 @@ ind2_pvalue = 1-chi2cdf(ind2,1)
 % Load the data using hist_stock_data.m
 price2 = hist_stock_data('01012012','31122022','ABT');
 % Calculating simple returns
-simple_y2=(price2.Close(2:end)-price2.Close(1:end-1))./price2.Close(1:end-1);
+simple_y2 = (price2.Close(2:end)-price2.Close(1:end-1))./price2.Close(1:end-1);
 
 % Stock 3
 % Load the data using hist_stock_data.m
 price3 = hist_stock_data('01012012','31122022','PFE');
 % Calculating simple returns
-simple_y3=(price3.Close(2:end)-price3.Close(1:end-1))./price3.Close(1:end-1);
+simple_y3 = (price3.Close(2:end)-price3.Close(1:end-1))./price3.Close(1:end-1);
 
 %% Plot returns
 f = f + 1;
@@ -251,37 +251,37 @@ title('Simple returns for Pfizer Inc.');
 %% Question 3(b)
 
 % Number of Stocks
-N=3;
+N = 3;
 
 % Constraints
-Aeq=ones(1,N); 
-beq=1; 
+Aeq = ones(1,N); 
+beq = 1; 
 
 % Upper and Lower Bound on Individual Weights 
-lb=zeros(1,N); 
-ub=ones(1,N);
+lb = zeros(1,N); 
+ub = ones(1,N);
 
 % Options 
-options= optimset('Algorithm','interior-point-convex', 'Display','off');
+options = optimset('Algorithm','interior-point-convex', 'Display','off');
 
 % Risk Aversion 
-gamma=3; 
+gamma = 3; 
 
 % Estimation Window
-W_E=800;
+W_E = 800;
 
 % Storage matrices
-mu_opt=zeros(N,length(simple_y2)-W_E+1); 
-cov_opt=zeros(N,N,length(simple_y2)-W_E+1); 
-weights=zeros(N,length(simple_y2)-W_E+1); 
-variances=zeros(N,length(simple_y2)-W_E+1); 
+mu_opt = zeros(N,length(simple_y2) - W_E + 1); 
+cov_opt = zeros(N,N,length(simple_y2) - W_E + 1); 
+weights = zeros(N,length(simple_y2) - W_E + 1); 
+variances = zeros(N,length(simple_y2) - W_E + 1); 
 
 % Optimization loop
-for i=1:length(simple_y2)-W_E+1
+for i = 1:length(simple_y2) - W_E + 1
   
-    % Multivariate moments
-    mu_opt(:,i)=[mean(simple_y(i:W_E-1+i)); mean(simple_y2(i:W_E-1+i)); mean(simple_y3(1:W_E-1+i))]; 
-    cov_opt(:,:,i) = cov([simple_y(i:W_E-1+i), simple_y2(i:W_E-1+i), simple_y3(i:W_E-1+i)]); 
+    % Multivariate moments 
+    mu_opt(:,i) = [mean(simple_y(i:W_E - 1 + i)); mean(simple_y2(i:W_E - 1 + i)); mean(simple_y3(1:W_E - 1 + i))]; 
+    cov_opt(:,:,i) = cov([simple_y(i:W_E - 1 + i), simple_y2(i:W_E - 1 + i), simple_y3(i:W_E - 1 + i)]); 
 
     % Optimization inputs
     H_opt = gamma * cov_opt(:, :, i); % Covariance times risk aversion
@@ -314,7 +314,7 @@ display(date(2))
 % Import 5 Year Treasury Yield 
 yield = hist_stock_data('12032015','31122022', '^FVX'); % start at date W_E+1
 
-rf=NaN*ones(1,length(simple_y)-W_E); 
+rf = NaN * ones(1,length(simple_y) - W_E); 
 
 % Filling up NaNs and empty values
 
@@ -327,9 +327,9 @@ for i = 1:length(simple_y)-W_E
     end
 end
 
-for i=1:length(rf)
+for i = 1:length(rf)
     if isnan(rf(i))
-        rf(i)= rf(i-1); 
+        rf(i) = rf(i-1); 
     else 
     end 
 end 
@@ -340,7 +340,7 @@ daily_rf = rf/250;
 
 portfolio_returns = zeros(length(weights) - 1);
 
-for i=1:(length(weights) - 1)
+for i = 1:(length(weights) - 1)
     portfolio_returns(i)= weights(:, i)' * [simple_y(W_E+i); simple_y2(W_E+i); simple_y3(W_E+i);];
 end
 
