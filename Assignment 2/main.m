@@ -1,4 +1,4 @@
-%% Stock Data Intel Corporation (2012-2022)
+
 % For Empirical Finance 3.2
 % Assignment 2
 % By team 40 (Levente Szabo, Nicolas Barry, Renzo Vermeulen)
@@ -79,6 +79,40 @@ xlim([0.5 8.5])
 ylim([800 1500])
 daspect([1 70 1]);
 hold off
+
+%% Question 1 (d) 
+% Perform 10,000 MC simulations
+S=10000;
+eps = randn(1,S)* sigma; % generate random yield changes in a loop
+% Add shift to the yield
+ysim=nan(T,S);
+for i = 1:S
+ysim(:,i) = yield + eps(i);
+end
+% Price the bond
+SP2 = zeros(1,S); % vector for sim prices
+for s = 1:S % do S simulations
+SP2(s) = sum(cash_flow./((1+transpose(ysim(:,s))./100).^(1:T)));
+end
+% Obtain profits/losses
+PL=SP2-P;
+% Calculate VaR using "historic" simulation method
+PL=sort(PL);
+VaR1= PL(S*0.01);
+VaR5 = PL(S*0.05);
+% Plot profits/losses and VaR
+f=f+1;
+figure(f)
+hold on
+histfit(PL,100)
+xlabel('Profits/Losses')
+ylabel('Frequency')
+xline(VaR1,'--', {'VaR(0.01)'});
+xline(VaR5,'--', {'VaR(0.05)'});
+xlim([-360 600])
+hold off
+saveas(gcf, 'YieldShocking.png');
+
 
 %% Question 2 (a)
 
